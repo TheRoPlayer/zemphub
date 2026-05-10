@@ -1,7 +1,4 @@
---// =========================================
---// Zemp UI Library v7 - Fixed & Stable
---// Clean OOP Structure + Working Elements
---// =========================================
+!strict
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
