@@ -1,6 +1,6 @@
 -- =============================================
--- Zemp UI Library v4.2 - FULL FEATURES
--- Clean, Bright, Professional Roblox UI
+-- Zemp UI Library v4.3 - FIXED (No PaddingAll)
+-- Clean, Bright, Professional
 -- =============================================
 
 local TweenService = game:GetService("TweenService")
@@ -60,7 +60,9 @@ function Zemp:CreateWindow(config)
     title.Font = Enum.Font.GothamBlack
     title.TextXAlignment = Enum.TextXAlignment.Left
     title.Parent = window.Topbar
-    Instance.new("UIPadding", title).PaddingLeft = UDim.new(0, 30)
+
+    local titlePad = Instance.new("UIPadding", title)
+    titlePad.PaddingLeft = UDim.new(0, 30)
 
     -- Top Buttons
     local function TopBtn(text, color, pos, cb)
@@ -99,7 +101,7 @@ function Zemp:CreateWindow(config)
         if inp.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
     end)
 
-    -- Containers
+    -- Tab Container
     window.TabContainer = Instance.new("ScrollingFrame")
     window.TabContainer.Size = UDim2.new(0.28, 0, 1, -70)
     window.TabContainer.Position = UDim2.new(0, 0, 0, 70)
@@ -108,9 +110,14 @@ function Zemp:CreateWindow(config)
     window.TabContainer.Parent = window.Main
 
     Instance.new("UIListLayout", window.TabContainer).Padding = UDim.new(0, 8)
-    local tp = Instance.new("UIPadding", window.TabContainer)
-    tp.PaddingLeft = UDim.new(0,16); tp.PaddingRight = UDim.new(0,16); tp.PaddingTop = UDim.new(0,16)
 
+    local tabPad = Instance.new("UIPadding", window.TabContainer)
+    tabPad.PaddingLeft = UDim.new(0, 16)
+    tabPad.PaddingRight = UDim.new(0, 16)
+    tabPad.PaddingTop = UDim.new(0, 16)
+    tabPad.PaddingBottom = UDim.new(0, 16)
+
+    -- Content
     window.Content = Instance.new("Frame")
     window.Content.Size = UDim2.new(0.72, 0, 1, -70)
     window.Content.Position = UDim2.new(0.28, 0, 0, 70)
@@ -129,7 +136,7 @@ function Zemp:CreateTab(name)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1,0,0,55)
     btn.BackgroundColor3 = Theme.Element
-    btn.Text = "   "..name
+    btn.Text = "   " .. name
     btn.TextColor3 = Theme.Text
     btn.TextScaled = true
     btn.Font = Enum.Font.GothamSemibold
@@ -148,8 +155,12 @@ function Zemp:CreateTab(name)
     tab.Content.Parent = self.Content
 
     Instance.new("UIListLayout", tab.Content).Padding = UDim.new(0,16)
-    local cp = Instance.new("UIPadding", tab.Content)
-    cp.PaddingLeft = UDim.new(0,20); cp.PaddingRight = UDim.new(0,20); cp.PaddingTop = UDim.new(0,20)
+
+    local contentPad = Instance.new("UIPadding", tab.Content)
+    contentPad.PaddingLeft = UDim.new(0,20)
+    contentPad.PaddingRight = UDim.new(0,20)
+    contentPad.PaddingTop = UDim.new(0,20)
+    contentPad.PaddingBottom = UDim.new(0,20)
 
     btn.MouseButton1Click:Connect(function()
         for _, t in ipairs(self.Tabs) do t.Content.Visible = false end
@@ -162,26 +173,7 @@ function Zemp:CreateTab(name)
     return tab
 end
 
--- ==================== ALL ELEMENTS ====================
-
-function Zemp:CreateLabel(tab, text)
-    local l = Instance.new("TextLabel")
-    l.Size = UDim2.new(1,0,0,35)
-    l.BackgroundTransparency = 1
-    l.Text = text
-    l.TextColor3 = Theme.Text
-    l.TextScaled = true
-    l.Font = Enum.Font.Gotham
-    l.TextXAlignment = Enum.TextXAlignment.Left
-    l.Parent = tab.Content
-end
-
-function Zemp:CreateDivider(tab)
-    local d = Instance.new("Frame")
-    d.Size = UDim2.new(1,0,0,2)
-    d.BackgroundColor3 = Theme.Stroke
-    d.Parent = tab.Content
-end
+-- ==================== ELEMENTS ====================
 
 function Zemp:CreateButton(tab, config)
     local b = Instance.new("TextButton")
@@ -199,57 +191,7 @@ function Zemp:CreateButton(tab, config)
     b.MouseButton1Click:Connect(config.Callback or function() end)
 end
 
-function Zemp:CreateToggle(tab, config)
-    local f = Instance.new("Frame")
-    f.Size = UDim2.new(1,0,0,55)
-    f.BackgroundTransparency = 1
-    f.Parent = tab.Content
-
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(0.7,0,1,0)
-    label.BackgroundTransparency = 1
-    label.Text = config.Name or "Toggle"
-    label.TextColor3 = Theme.Text
-    label.TextScaled = true
-    label.Font = Enum.Font.Gotham
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = f
-
-    local tog = Instance.new("TextButton")
-    tog.Size = UDim2.new(0,56,0,30)
-    tog.Position = UDim2.new(1,-70,0.5,-15)
-    tog.BackgroundColor3 = Theme.Element
-    tog.Parent = f
-    Instance.new("UICorner", tog).CornerRadius = UDim.new(1,0)
-
-    local circle = Instance.new("Frame")
-    circle.Size = UDim2.new(0,24,0,24)
-    circle.Position = UDim2.new(0,3,0.5,-12)
-    circle.BackgroundColor3 = Theme.Text
-    circle.Parent = tog
-    Instance.new("UICorner", circle).CornerRadius = UDim.new(1,0)
-
-    local state = config.Default or false
-    local function update()
-        if state then
-            Tween(tog, {BackgroundColor3 = Theme.Accent}, 0.3)
-            Tween(circle, {Position = UDim2.new(1,-27,0.5,-12)}, 0.3)
-        else
-            Tween(tog, {BackgroundColor3 = Theme.Element}, 0.3)
-            Tween(circle, {Position = UDim2.new(0,3,0.5,-12)}, 0.3)
-        end
-    end
-
-    tog.MouseButton1Click:Connect(function()
-        state = not state
-        update()
-        if config.Callback then config.Callback(state) end
-    end)
-    update()
-end
-
 function Zemp:CreateSlider(tab, config)
-    -- (Same working slider from previous version - using new theme)
     local f = Instance.new("Frame")
     f.Size = UDim2.new(1,0,0,80)
     f.BackgroundTransparency = 1
@@ -276,12 +218,12 @@ function Zemp:CreateSlider(tab, config)
     fill.Parent = bar
     Instance.new("UICorner", fill).CornerRadius = UDim.new(1,0)
 
-    local val = Instance.new("TextLabel")
-    val.Text = tostring(config.Default or 50)
-    val.Position = UDim2.new(1,-65,0,35)
-    val.BackgroundTransparency = 1
-    val.TextColor3 = Theme.Text
-    val.Parent = f
+    local valLabel = Instance.new("TextLabel")
+    valLabel.Text = tostring(config.Default or 50)
+    valLabel.Position = UDim2.new(1,-70,0,35)
+    valLabel.BackgroundTransparency = 1
+    valLabel.TextColor3 = Theme.Text
+    valLabel.Parent = f
 
     local min, max = config.Min or 0, config.Max or 100
     local dragging = false
@@ -290,7 +232,7 @@ function Zemp:CreateSlider(tab, config)
         local rel = math.clamp((inp.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1)
         fill.Size = UDim2.new(rel, 0, 1, 0)
         local value = math.floor(min + (max - min) * rel)
-        val.Text = tostring(value)
+        valLabel.Text = tostring(value)
         if config.Callback then config.Callback(value) end
     end
 
@@ -298,8 +240,6 @@ function Zemp:CreateSlider(tab, config)
     UserInputService.InputChanged:Connect(function(i) if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then update(i) end end)
     UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end end)
 end
-
--- Add more elements (Textbox, Keybind, etc.) if needed - just ask!
 
 function Zemp:Notify(config)
     local gui = playerGui:FindFirstChild("ZempNotifs") or Instance.new("ScreenGui")
@@ -314,7 +254,7 @@ function Zemp:Notify(config)
     Instance.new("UICorner", n).CornerRadius = UDim.new(0,16)
 
     local t = Instance.new("TextLabel", n)
-    t.Text = "Zemp • " .. (config.Title or "")
+    t.Text = "Zemp • " .. (config.Title or "Notification")
     t.Size = UDim2.new(1,0,0.4,0)
     t.BackgroundTransparency = 1
     t.TextColor3 = Theme.Accent
@@ -330,6 +270,7 @@ function Zemp:Notify(config)
     c.TextScaled = true
 
     Tween(n, {Position = UDim2.new(1,-390,1,-140)}, 0.6)
+
     task.delay(config.Duration or 5, function()
         Tween(n, {Position = UDim2.new(1,50,1,-140)}, 0.5)
         task.wait(0.6)
