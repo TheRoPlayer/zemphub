@@ -1,6 +1,6 @@
 -- =============================================
--- Zemp UI Library v6.4 - COMPLETE
--- All Elements + Discord + Key System
+-- Zemp UI Library v6.5 - FULL COMPLETE LOADER
+-- All Elements + Strong Scripts + Discord + Key System
 -- =============================================
 
 local TweenService = game:GetService("TweenService")
@@ -27,6 +27,7 @@ local function Tween(obj, props, time)
     TweenService:Create(obj, TweenInfo.new(time or 0.35, Enum.EasingStyle.Quint), props):Play()
 end
 
+-- ==================== CREATE WINDOW ====================
 function Zemp:CreateWindow(config)
     local window = setmetatable({}, Zemp)
     
@@ -123,7 +124,6 @@ end
 
 function Zemp:CreateTab(name)
     local tab = {}
-
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1,0,0,52)
     btn.BackgroundColor3 = Theme.Element
@@ -156,12 +156,10 @@ function Zemp:CreateTab(name)
 
     table.insert(self.Tabs, tab)
     if #self.Tabs == 1 then tab.Content.Visible = true end
-
     return tab
 end
 
 -- ==================== ALL ELEMENTS ====================
-
 function Zemp:CreateLabel(tab, text)
     local l = Instance.new("TextLabel")
     l.Size = UDim2.new(1,0,0,32)
@@ -237,7 +235,6 @@ function Zemp:CreateToggle(tab, config)
             Tween(circle, {Position = UDim2.new(0,3,0.5,-12)}, 0.3)
         end
     end
-
     tog.MouseButton1Click:Connect(function()
         state = not state
         update()
@@ -318,6 +315,87 @@ function Zemp:CreateTextbox(tab, config)
     box.FocusLost:Connect(function() if config.Callback then config.Callback(box.Text) end end)
 end
 
+function Zemp:CreateDropdown(tab, config)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1,0,0,50)
+    frame.BackgroundColor3 = Theme.Element
+    frame.Parent = tab.Content
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0,12)
+
+    local selected = Instance.new("TextButton")
+    selected.Size = UDim2.new(1,0,1,0)
+    selected.BackgroundTransparency = 1
+    selected.Text = config.Name .. ": " .. (config.Default or config.Options[1] or "Select")
+    selected.TextColor3 = Theme.Text
+    selected.TextSize = 16
+    selected.Parent = frame
+
+    local dropdown = Instance.new("Frame")
+    dropdown.Size = UDim2.new(1,0,0,0)
+    dropdown.Position = UDim2.new(0,0,1,5)
+    dropdown.BackgroundColor3 = Theme.Element
+    dropdown.Visible = false
+    dropdown.Parent = frame
+    Instance.new("UICorner", dropdown).CornerRadius = UDim.new(0,12)
+
+    for _, opt in ipairs(config.Options or {}) do
+        local optBtn = Instance.new("TextButton")
+        optBtn.Size = UDim2.new(1,0,0,35)
+        optBtn.BackgroundTransparency = 1
+        optBtn.Text = opt
+        optBtn.TextColor3 = Theme.Text
+        optBtn.Parent = dropdown
+        optBtn.MouseButton1Click:Connect(function()
+            selected.Text = config.Name .. ": " .. opt
+            dropdown.Visible = false
+            if config.Callback then config.Callback(opt) end
+        end)
+    end
+
+    selected.MouseButton1Click:Connect(function()
+        dropdown.Visible = not dropdown.Visible
+    end)
+end
+
+function Zemp:CreateKeybind(tab, config)
+    local f = Instance.new("Frame")
+    f.Size = UDim2.new(1,0,0,50)
+    f.BackgroundColor3 = Theme.Element
+    f.Parent = tab.Content
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0,12)
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0.6,0,1,0)
+    label.BackgroundTransparency = 1
+    label.Text = config.Name or "Keybind"
+    label.TextColor3 = Theme.Text
+    label.TextSize = 16
+    label.Parent = f
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.35,0,0.7,0)
+    btn.Position = UDim2.new(0.6,0,0.15,0)
+    btn.BackgroundColor3 = Theme.ElementHover
+    btn.Text = "None"
+    btn.TextColor3 = Theme.Text
+    btn.Parent = f
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0,8)
+
+    local listening = false
+    btn.MouseButton1Click:Connect(function()
+        listening = true
+        btn.Text = "..."
+    end)
+
+    UserInputService.InputBegan:Connect(function(input)
+        if listening and input.UserInputType == Enum.UserInputType.Keyboard then
+            btn.Text = input.KeyCode.Name
+            if config.Callback then config.Callback(input.KeyCode) end
+            listening = false
+        end
+    end)
+end
+
 function Zemp:CreateDiscordButton(tab, config)
     local link = config.Link or "https://discord.gg/example"
     local b = Instance.new("TextButton")
@@ -332,20 +410,20 @@ function Zemp:CreateDiscordButton(tab, config)
 
     b.MouseButton1Click:Connect(function()
         setclipboard(link)
-        Zemp:Notify({Title = "Discord", Content = "Link copied!"})
+        Zemp:Notify({Title = "Discord", Content = "Link copied to clipboard!"})
     end)
 end
 
 function Zemp:CreateKeySystemPlaceholder(tab)
-    Zemp:CreateLabel(tab, "🔑 Key System")
+    Zemp:CreateLabel(tab, "🔑 Key System Coming Soon")
     Zemp:CreateDivider(tab)
-    Zemp:CreateLabel(tab, "Key system is coming soon!")
     Zemp:CreateDiscordButton(tab, {Name = "Get Key from Discord"})
 end
 
 function Zemp:Notify(config)
     local gui = playerGui:FindFirstChild("ZempNotifs") or Instance.new("ScreenGui")
-    gui.Name = "ZempNotifs" gui.Parent = playerGui
+    gui.Name = "ZempNotifs"
+    gui.Parent = playerGui
 
     local n = Instance.new("Frame")
     n.Size = UDim2.new(0,390,0,100)
@@ -354,7 +432,7 @@ function Zemp:Notify(config)
     n.Parent = gui
     Instance.new("UICorner", n).CornerRadius = UDim.new(0,16)
 
-    local t = Instance.new("TextLabel",n) t.Text = "Zemp • "..(config.Title or "") t.TextSize = 18 t.TextColor3 = Theme.Accent t.Size = UDim2.new(1,0,0.4,0) t.BackgroundTransparency = 1 t.Font = Enum.Font.GothamBold
+    local t = Instance.new("TextLabel",n) t.Text = "Zemp • "..(config.Title or "") t.TextSize = 18 t.TextColor3 = Theme.Accent t.Size = UDim2.new(1,0,0.4,0) t.BackgroundTransparency = 1
     local c = Instance.new("TextLabel",n) c.Text = config.Content or "" c.TextSize = 15 c.TextColor3 = Theme.Text c.Position = UDim2.new(0,0,0.4,0) c.Size = UDim2.new(1,0,0.6,0) c.BackgroundTransparency = 1
 
     Tween(n, {Position = UDim2.new(1,-410,1,-130)}, 0.6)
