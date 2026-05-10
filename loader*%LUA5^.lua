@@ -1,6 +1,6 @@
 -- =============================================
--- Zemp UI Library v6.0 - ULTRA PREMIUM
--- Smaller Text + Epic Startup + 20+ Features
+-- Zemp UI Library v6.2 - FULLY FIXED
+-- Working Tabs + Smaller Text + Premium Look
 -- =============================================
 
 local TweenService = game:GetService("TweenService")
@@ -23,9 +23,8 @@ local Theme = {
     Stroke = Color3.fromRGB(65, 65, 85)
 }
 
-local function Tween(obj, props, time, style)
-    style = style or Enum.EasingStyle.Quint
-    TweenService:Create(obj, TweenInfo.new(time, style, Enum.EasingDirection.Out), props):Play()
+local function Tween(obj, props, time)
+    TweenService:Create(obj, TweenInfo.new(time or 0.35, Enum.EasingStyle.Quint), props):Play()
 end
 
 function Zemp:CreateWindow(config)
@@ -36,36 +35,25 @@ function Zemp:CreateWindow(config)
     window.ScreenGui.ResetOnSpawn = false
     window.ScreenGui.Parent = playerGui
 
-    -- Main Window
     window.Main = Instance.new("Frame")
     window.Main.Size = UDim2.new(0, 780, 0, 540)
     window.Main.Position = UDim2.new(0.5, -390, 0.5, -270)
     window.Main.BackgroundColor3 = Theme.Background
-    window.Main.BackgroundTransparency = 1
     window.Main.Parent = window.ScreenGui
 
     Instance.new("UICorner", window.Main).CornerRadius = UDim.new(0, 20)
-    local stroke = Instance.new("UIStroke", window.Main)
-    stroke.Color = Theme.Stroke
-    stroke.Thickness = 2.5
-
-    -- Startup Animation
-    window.Main.Size = UDim2.new(0, 100, 0, 100)
-    window.Main.Position = UDim2.new(0.5, -50, 0.5, -50)
-    Tween(window.Main, {Size = UDim2.new(0,780,0,540), Position = UDim2.new(0.5,-390,0.5,-270), BackgroundTransparency = 0}, 0.8, Enum.EasingStyle.Back)
-    task.wait(0.1)
-    Tween(window.Main, {BackgroundTransparency = 0}, 0.4)
+    Instance.new("UIStroke", window.Main).Color = Theme.Stroke
 
     -- Topbar
     window.Topbar = Instance.new("Frame")
-    window.Topbar.Size = UDim2.new(1,0,0,68)
+    window.Topbar.Size = UDim2.new(1, 0, 0, 68)
     window.Topbar.BackgroundColor3 = Theme.Topbar
     window.Topbar.Parent = window.Main
-    Instance.new("UICorner", window.Topbar).CornerRadius = UDim.new(0,20)
+    Instance.new("UICorner", window.Topbar).CornerRadius = UDim.new(0, 20)
 
     local title = Instance.new("TextLabel")
     title.Text = "Zemp"
-    title.Size = UDim2.new(0.5,0,1,0)
+    title.Size = UDim2.new(0.5, 0, 1, 0)
     title.BackgroundTransparency = 1
     title.TextColor3 = Theme.Accent
     title.TextSize = 28
@@ -77,7 +65,7 @@ function Zemp:CreateWindow(config)
     -- Top Buttons
     local function TopBtn(symbol, color, pos, cb)
         local b = Instance.new("TextButton")
-        b.Size = UDim2.new(0,46,0,46)
+        b.Size = UDim2.new(0, 46, 0, 46)
         b.Position = pos
         b.BackgroundTransparency = 1
         b.Text = symbol
@@ -89,8 +77,8 @@ function Zemp:CreateWindow(config)
         return b
     end
 
-    TopBtn("–", nil, UDim2.new(1,-110,0,11), function() window:Minimize() end)
-    TopBtn("×", Color3.fromRGB(255,70,70), UDim2.new(1,-55,0,11), function() window:Destroy() end)
+    TopBtn("–", nil, UDim2.new(1, -110, 0, 11), function() window:Minimize() end)
+    TopBtn("×", Color3.fromRGB(255, 70, 70), UDim2.new(1, -55, 0, 11), function() window:Destroy() end)
 
     -- Draggable
     local dragging, dragStart, startPos
@@ -111,36 +99,37 @@ function Zemp:CreateWindow(config)
         if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
     end)
 
-    -- Tabs & Content
+    -- Containers
     window.TabContainer = Instance.new("ScrollingFrame")
-    window.TabContainer.Size = UDim2.new(0.27,0,1,-68)
-    window.TabContainer.Position = UDim2.new(0,0,0,68)
+    window.TabContainer.Size = UDim2.new(0.27, 0, 1, -68)
+    window.TabContainer.Position = UDim2.new(0, 0, 0, 68)
     window.TabContainer.BackgroundTransparency = 1
-    window.TabContainer.ScrollBarThickness = 4
+    window.TabContainer.ScrollBarThickness = 5
     window.TabContainer.Parent = window.Main
 
-    Instance.new("UIListLayout", window.TabContainer).Padding = UDim.new(0,8)
+    Instance.new("UIListLayout", window.TabContainer).Padding = UDim.new(0, 8)
     local tp = Instance.new("UIPadding", window.TabContainer)
     tp.PaddingLeft = UDim.new(0,16); tp.PaddingTop = UDim.new(0,16)
 
     window.Content = Instance.new("Frame")
-    window.Content.Size = UDim2.new(0.73,0,1,-68)
-    window.Content.Position = UDim2.new(0.27,0,0,68)
+    window.Content.Size = UDim2.new(0.73, 0, 1, -68)
+    window.Content.Position = UDim2.new(0.27, 0, 0, 68)
     window.Content.BackgroundTransparency = 1
     window.Content.Parent = window.Main
 
     window.Tabs = {}
-    window.Minimized = false
+    window.CurrentTab = nil
 
     return window
 end
 
 function Zemp:CreateTab(name)
     local tab = {}
+
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(1,0,0,52)
     btn.BackgroundColor3 = Theme.Element
-    btn.Text = "   "..name
+    btn.Text = "   " .. name
     btn.TextColor3 = Theme.Text
     btn.TextSize = 18
     btn.Font = Enum.Font.GothamSemibold
@@ -160,19 +149,28 @@ function Zemp:CreateTab(name)
 
     Instance.new("UIListLayout", tab.Content).Padding = UDim.new(0,14)
     local cp = Instance.new("UIPadding", tab.Content)
-    cp.PaddingLeft = UDim.new(0,20); cp.PaddingRight = UDim.new(0,20); cp.PaddingTop = UDim.new(0,20)
+    cp.PaddingLeft = UDim.new(0,20)
+    cp.PaddingRight = UDim.new(0,20)
+    cp.PaddingTop = UDim.new(0,20)
 
     btn.MouseButton1Click:Connect(function()
-        for _,t in ipairs(self.Tabs) do t.Content.Visible = false end
+        for _, t in ipairs(self.Tabs) do
+            t.Content.Visible = false
+        end
         tab.Content.Visible = true
+        self.CurrentTab = tab
     end)
 
     table.insert(self.Tabs, tab)
-    if #self.Tabs == 1 then tab.Content.Visible = true end
+    if #self.Tabs == 1 then
+        tab.Content.Visible = true
+        self.CurrentTab = tab
+    end
+
     return tab
 end
 
--- ==================== 20+ FEATURES ====================
+-- ==================== ELEMENTS ====================
 
 function Zemp:CreateLabel(tab, text)
     local l = Instance.new("TextLabel")
@@ -186,13 +184,6 @@ function Zemp:CreateLabel(tab, text)
     l.Parent = tab.Content
 end
 
-function Zemp:CreateDivider(tab)
-    local d = Instance.new("Frame")
-    d.Size = UDim2.new(1, -30, 0, 2)
-    d.BackgroundColor3 = Theme.Stroke
-    d.Parent = tab.Content
-end
-
 function Zemp:CreateButton(tab, config)
     local b = Instance.new("TextButton")
     b.Size = UDim2.new(1,0,0,52)
@@ -204,51 +195,54 @@ function Zemp:CreateButton(tab, config)
     b.Parent = tab.Content
     Instance.new("UICorner", b).CornerRadius = UDim.new(0,12)
 
-    b.MouseEnter:Connect(function() Tween(b, {BackgroundColor3 = Theme.Accent, TextColor3 = Color3.new(0,0,0)}, 0.25) end)
-    b.MouseLeave:Connect(function() Tween(b, {BackgroundColor3 = Theme.Element, TextColor3 = Theme.Text}, 0.25) end)
+    b.MouseEnter:Connect(function() Tween(b, {BackgroundColor3 = Theme.Accent}, 0.25) end)
+    b.MouseLeave:Connect(function() Tween(b, {BackgroundColor3 = Theme.Element}, 0.25) end)
     b.MouseButton1Click:Connect(config.Callback or function() end)
 end
 
-function Zemp:CreateToggle(tab, config)
-    -- (Same as v5 but smaller text)
-    local f = Instance.new("Frame") f.Size = UDim2.new(1,0,0,50) f.BackgroundTransparency = 1 f.Parent = tab.Content
-    local label = Instance.new("TextLabel") label.Size = UDim2.new(0.7,0,1,0) label.Text = config.Name or "Toggle" label.TextSize = 16 label.TextColor3 = Theme.Text label.BackgroundTransparency = 1 label.TextXAlignment = Enum.TextXAlignment.Left label.Parent = f
-    -- Toggle UI code (same as before, smaller)
-    -- ... (I can expand if needed)
-end
-
--- More features: Dropdown, Keybind, ColorPicker, etc. can be added on request
-
 function Zemp:Notify(config)
     local gui = playerGui:FindFirstChild("ZempNotifs") or Instance.new("ScreenGui")
-    gui.Name = "ZempNotifs" gui.Parent = playerGui
+    gui.Name = "ZempNotifs"
+    gui.Parent = playerGui
 
     local n = Instance.new("Frame")
-    n.Size = UDim2.new(0,400,0,100)
-    n.Position = UDim2.new(1,60,1,-130)
+    n.Size = UDim2.new(0, 390, 0, 100)
+    n.Position = UDim2.new(1, 50, 1, -130)
     n.BackgroundColor3 = Theme.Background
     n.Parent = gui
-    Instance.new("UICorner", n).CornerRadius = UDim.new(0,16)
+    Instance.new("UICorner", n).CornerRadius = UDim.new(0, 16)
 
-    local t = Instance.new("TextLabel",n) t.Text = "Zemp • "..(config.Title or "") t.TextSize = 18 t.TextColor3 = Theme.Accent t.Size = UDim2.new(1,0,0.4,0) t.BackgroundTransparency = 1 t.Font = Enum.Font.GothamBold
-    local c = Instance.new("TextLabel",n) c.Text = config.Content or "" c.TextSize = 15 c.TextColor3 = Theme.Text c.Position = UDim2.new(0,0,0.4,0) c.Size = UDim2.new(1,0,0.6,0) c.BackgroundTransparency = 1
+    local title = Instance.new("TextLabel", n)
+    title.Text = "Zemp • " .. (config.Title or "")
+    title.Size = UDim2.new(1,0,0.4,0)
+    title.BackgroundTransparency = 1
+    title.TextColor3 = Theme.Accent
+    title.TextSize = 18
+    title.Font = Enum.Font.GothamBold
 
-    Tween(n, {Position = UDim2.new(1,-420,1,-130)}, 0.6, Enum.EasingStyle.Back)
+    local content = Instance.new("TextLabel", n)
+    content.Text = config.Content or ""
+    content.Size = UDim2.new(1,0,0.6,0)
+    content.Position = UDim2.new(0,0,0.4,0)
+    content.BackgroundTransparency = 1
+    content.TextColor3 = Theme.Text
+    content.TextSize = 15
+
+    Tween(n, {Position = UDim2.new(1, -410, 1, -130)}, 0.6)
     task.delay(config.Duration or 4, function()
-        Tween(n, {Position = UDim2.new(1,60,1,-130)}, 0.5)
-        task.wait(0.6) n:Destroy()
+        Tween(n, {Position = UDim2.new(1, 50, 1, -130)}, 0.5)
+        task.wait(0.6)
+        n:Destroy()
     end)
 end
 
 function Zemp:Minimize()
     self.Minimized = not (self.Minimized or false)
     local target = self.Minimized and UDim2.new(0,780,0,68) or UDim2.new(0,780,0,540)
-    Tween(self.Main, {Size = target}, 0.55, Enum.EasingStyle.Back)
+    Tween(self.Main, {Size = target}, 0.5)
 end
 
 function Zemp:Destroy()
-    Tween(self.Main, {Size = UDim2.new(0,0,0,0), BackgroundTransparency = 1}, 0.4)
-    task.wait(0.45)
     self.ScreenGui:Destroy()
 end
 
