@@ -1,4 +1,4 @@
-!strict
+
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
