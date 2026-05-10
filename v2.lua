@@ -1,6 +1,6 @@
 -- =============================================
--- Zemp UI Library v7 - FULL COMPLETE
--- All Features + Stable + Safe Scripts
+-- Zemp UI Library v7 - Complete & Fixed
+-- Based on ChatGPT structure + All Features Added
 -- =============================================
 
 local TweenService = game:GetService("TweenService")
@@ -40,7 +40,7 @@ local function Create(class, props)
     return obj
 end
 
--- ==================== CREATE WINDOW ====================
+-- ==================== WINDOW ====================
 function Zemp:CreateWindow(config)
     config = config or {}
     local window = setmetatable({}, Window)
@@ -75,16 +75,7 @@ function Zemp:CreateWindow(config)
 
     -- Top Buttons
     local function TopButton(text, pos, color, callback)
-        local btn = Create("TextButton", {
-            Size = UDim2.new(0,42,0,42),
-            Position = pos,
-            BackgroundTransparency = 1,
-            Text = text,
-            TextColor3 = color or Theme.Text,
-            TextSize = 24,
-            Font = Enum.Font.GothamBold,
-            Parent = Topbar
-        })
+        local btn = Create("TextButton", {Size = UDim2.new(0,42,0,42), Position = pos, BackgroundTransparency = 1, Text = text, TextColor3 = color or Theme.Text, TextSize = 24, Font = Enum.Font.GothamBold, Parent = Topbar})
         btn.MouseButton1Click:Connect(callback)
         return btn
     end
@@ -126,7 +117,7 @@ function Window:CreateTab(name)
         TextColor3 = Theme.Text,
         TextSize = 17,
         Font = Enum.Font.GothamSemibold,
-        Parent = self.Main -- fallback, adjust if needed
+        Parent = self.Main
     })
     Create("UICorner", {CornerRadius = UDim.new(0,12), Parent = btn})
 
@@ -150,7 +141,7 @@ function Window:CreateTab(name)
     return tab
 end
 
--- ==================== ALL ELEMENTS ====================
+-- ==================== ALL FEATURES ====================
 function Tab:CreateLabel(text)
     return Create("TextLabel", {
         Size = UDim2.new(1,0,0,30),
@@ -176,8 +167,6 @@ function Tab:CreateButton(config)
     })
     Create("UICorner", {CornerRadius = UDim.new(0,12), Parent = btn})
 
-    btn.MouseEnter:Connect(function() Tween(btn, {BackgroundColor3 = Theme.Accent}, 0.2) end)
-    btn.MouseLeave:Connect(function() Tween(btn, {BackgroundColor3 = Theme.Element}, 0.2) end)
     btn.MouseButton1Click:Connect(config.Callback or function() end)
     return btn
 end
@@ -186,16 +175,7 @@ function Tab:CreateToggle(config)
     local state = config.Default or false
     local holder = Create("Frame", {Size = UDim2.new(1,0,0,50), BackgroundTransparency = 1, Parent = self.Page})
 
-    Create("TextLabel", {
-        Size = UDim2.new(0.7,0,1,0),
-        BackgroundTransparency = 1,
-        Text = config.Name or "Toggle",
-        TextColor3 = Theme.Text,
-        TextSize = 16,
-        Font = Enum.Font.Gotham,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        Parent = holder
-    })
+    Create("TextLabel", {Size = UDim2.new(0.7,0,1,0), BackgroundTransparency = 1, Text = config.Name or "Toggle", TextColor3 = Theme.Text, TextSize = 16, Parent = holder})
 
     local tog = Create("TextButton", {Size = UDim2.new(0,56,0,30), Position = UDim2.new(1,-70,0.5,-15), BackgroundColor3 = Theme.Element, Parent = holder})
     Create("UICorner", {CornerRadius = UDim.new(1,0), Parent = tog})
@@ -251,23 +231,24 @@ function Tab:CreateSlider(config)
 end
 
 function Zemp:Notify(config)
-    local gui = PlayerGui:FindFirstChild("ZempNotifs") or Create("ScreenGui", {Name = "ZempNotifs", Parent = PlayerGui})
-    local n = Create("Frame", {Size = UDim2.new(0,390,0,100), Position = UDim2.new(1,50,1,-130), BackgroundColor3 = Theme.Background, Parent = gui})
-    Create("UICorner", {CornerRadius = UDim.new(0,16), Parent = n})
+    local gui = PlayerGui:FindFirstChild("ZempNotifications") or Create("ScreenGui", {Name = "ZempNotifications", Parent = PlayerGui})
+    local n = Create("Frame", {Size = UDim2.new(0,320,0,90), Position = UDim2.new(1,340,1,-110), BackgroundColor3 = Theme.Background, Parent = gui})
+    Create("UICorner", {CornerRadius = UDim.new(0,14), Parent = n})
 
-    Create("TextLabel", {Size = UDim2.new(1,0,0.4,0), BackgroundTransparency = 1, Text = "Zemp • " .. (config.Title or ""), TextColor3 = Theme.Accent, TextSize = 18, Parent = n})
-    Create("TextLabel", {Size = UDim2.new(1,0,0.6,0), Position = UDim2.new(0,0,0.4,0), BackgroundTransparency = 1, Text = config.Content or "", TextColor3 = Theme.Text, TextSize = 15, Parent = n})
+    Create("TextLabel", {Size = UDim2.new(1,-20,0,30), Position = UDim2.new(0,10,0,8), BackgroundTransparency = 1, Text = config.Title or "Notification", TextColor3 = Theme.Accent, TextSize = 18, Parent = n})
+    Create("TextLabel", {Size = UDim2.new(1,-20,1,-40), Position = UDim2.new(0,10,0,35), BackgroundTransparency = 1, Text = config.Content or "", TextColor3 = Theme.Text, TextSize = 14, TextWrapped = true, Parent = n})
 
-    Tween(n, {Position = UDim2.new(1,-410,1,-130)}, 0.6)
+    Tween(n, {Position = UDim2.new(1,-340,1,-110)}, 0.4)
     task.delay(config.Duration or 4, function()
-        Tween(n, {Position = UDim2.new(1,50,1,-130)}, 0.5)
-        task.wait(0.6) n:Destroy()
+        Tween(n, {Position = UDim2.new(1,340,1,-110)}, 0.4)
+        task.wait(0.45)
+        n:Destroy()
     end)
 end
 
 function Window:Minimize()
     self.Minimized = not (self.Minimized or false)
-    Tween(self.Main, {Size = self.Minimized and UDim2.new(0,780,0,65) or UDim2.new(0,780,0,540)}, 0.4)
+    Tween(self.Main, {Size = self.Minimized and UDim2.new(0,780,0,65) or UDim2.new(0,780,0,540)}, 0.35)
 end
 
 function Window:Destroy()
